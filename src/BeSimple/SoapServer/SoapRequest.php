@@ -34,17 +34,21 @@ class SoapRequest extends CommonSoapRequest
     {
         $content = is_null($content) ? file_get_contents("php://input") : $content;
         $location = self::getCurrentUrl();
-        $action = $_SERVER[SoapMessage::SOAP_ACTION_HEADER];
-        $contentType = $_SERVER[SoapMessage::CONTENT_TYPE_HEADER];
-
+        
         $request = new SoapRequest();
         // $content is if unmodified from SoapClient not a php string type!
         $request->setContent((string) $content);
         $request->setLocation($location);
-        $request->setAction($action);
         $request->setVersion($version);
-        $request->setContentType($contentType);
-
+        
+        switch ($version) {
+            case 1:
+                $request->setAction($_SERVER[SoapMessage::SOAP_ACTION_HEADER]);
+                break;
+            case 2:
+            default:
+                $request->setContentType($_SERVER[SoapMessage::CONTENT_TYPE_HEADER]);
+        }
         return $request;
     }
 
